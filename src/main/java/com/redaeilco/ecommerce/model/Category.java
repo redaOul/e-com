@@ -8,6 +8,8 @@ import javax.validation.constraints.*;
 
 import org.springframework.validation.annotation.Validated;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Validated
 public class Category {
@@ -19,6 +21,7 @@ public class Category {
     private String name;
 
     @ManyToMany(mappedBy = "categories")
+    @JsonIgnore
     private Set<Product> products = new HashSet<>();
 
     // Getters and Setters
