@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -37,8 +39,15 @@ public class Product {
     )
     private Set<Category> categories = new HashSet<>();
 
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
+
+    @JsonIgnore
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     private LocalDateTime updatedAt;
 
     // Getters and Setters
@@ -106,6 +115,14 @@ public class Product {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User user) {
+        this.createdBy = user;
+    }
     
     @PrePersist
     public void prePersist() {
@@ -140,4 +157,5 @@ public class Product {
                 ", updatedAt=" + updatedAt +
                 '}';
     }
+
 }

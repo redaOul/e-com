@@ -1,11 +1,9 @@
 package com.redaeilco.ecommerce.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import java.util.HashSet;
+import java.util.Set;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
@@ -16,6 +14,12 @@ public class User {
     private String username;
     private String password;
     private String role;
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    private Set<Product> products = new HashSet<>();
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
+    private Set<Category> categories = new HashSet<>();
 
     public int getId() {
         return id;

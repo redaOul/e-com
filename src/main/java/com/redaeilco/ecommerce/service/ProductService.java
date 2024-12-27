@@ -1,7 +1,9 @@
 package com.redaeilco.ecommerce.service;
 
 import com.redaeilco.ecommerce.model.Product;
+import com.redaeilco.ecommerce.model.User;
 import com.redaeilco.ecommerce.repository.ProductRepository;
+import com.redaeilco.ecommerce.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -15,6 +17,12 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JWTService jwtService;
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -26,12 +34,21 @@ public class ProductService {
             .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + id));
     }
 
-    public Product createProduct(Product product) {
+    public Product createProduct(Product product, String token) {
+        int userId = jwtService.extractUserId(token);
+        User user = userRepository.findById(userId).get();
+        product.setCreatedBy(user);
         return productRepository.save(product);
     }
 
-    public Product updateProduct(int id, Product productDetails) {
+    public Product updateProduct(int id, Product productDetails, String token) {
         Product product = getProductById(id);
+        int userId = jwtService.extractUserId(token);
+        User user = userRepository.findById(userId).get();
+        if (user != product.getCreatedBy()) {
+            throw new RuntimeException("You can only update your own products.");
+        }
+        /////////
         product.setName(productDetails.getName());
         product.setDescription(productDetails.getDescription());
         product.setPrice(productDetails.getPrice());
@@ -44,8 +61,13 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public void deleteProduct(int id) {
-        getProductById(id); // will throw an exception if the product is not found
+    public void deleteProduct(int id, String token) {
+        Product product = getProductById(id);
+        int userId = jwtService.extractUserId(token);
+        User user = userRepository.findById(userId).get();
+        if (user != product.getCreatedBy()) {
+            throw new RuntimeException("You can only delete your own products.");
+        }
         productRepository.deleteById(id);
     }
 }

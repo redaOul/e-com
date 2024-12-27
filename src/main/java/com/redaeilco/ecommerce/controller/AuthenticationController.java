@@ -6,7 +6,7 @@ import com.redaeilco.ecommerce.service.UserService;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+// import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +22,10 @@ public class AuthenticationController {
     private UserService userService;
     
     @PostMapping("/register")
+    // use general exception handler
     public ResponseEntity<?> register(@RequestBody User requestUser) {
         Map<String, Object> respond = userService.registerUser(requestUser);
-        return respond != null ? ResponseEntity.ok(respond) : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Username already exists"));
+        return ResponseEntity.ok(respond);
     }
     
     @PostMapping("/login")

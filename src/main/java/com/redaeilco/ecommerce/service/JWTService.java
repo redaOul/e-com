@@ -22,17 +22,16 @@ public class JWTService {
     private final int EXPIRATION_TIME = 1000 * 60 * 30; // 30 min
 
     public String generateToken(String username, String role, int userId) {
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
         claims.put("userId", userId);
 
         return Jwts.builder()
-            .claims()
-            .add(claims)
+            .claims(claims)
             .subject(username)
             .issuedAt(new Date(System.currentTimeMillis()))
             .expiration(new Date(System.currentTimeMillis () + EXPIRATION_TIME))
-            .and()
             .signWith(getKey())
             .compact();
     }
@@ -43,15 +42,18 @@ public class JWTService {
     }
 
     public String extractUserName(String token) {
-        // extract the username from jwt token
-        return extractClaim(token, Claims::getSubject);
+        token = formatToken(token);
+        String username = extractClaim(token, Claims::getSubject);
+        return username;
     }
 
     public int extractUserId(String token) {
+        token = formatToken(token);
         return extractClaim(token, claims -> claims.get("userId", Integer.class));
     }
 
     public String extractRole(String token) {
+        token = formatToken(token);
         return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
@@ -74,11 +76,17 @@ public class JWTService {
     }
 
     private boolean isTokenExpired(String token) {
+        token = formatToken(token);
         return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
+        token = formatToken(token);
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    private String formatToken(String token) {
+        return token.startsWith("Bearer ") ? token.substring(7) : token;
     }
     
 }

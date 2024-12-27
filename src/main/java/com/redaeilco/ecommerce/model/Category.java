@@ -17,9 +17,14 @@ public class Category {
     @NotNull(message = "Name of the category is required")
     private String name;
 
-    @ManyToMany(mappedBy = "categories")
     @JsonIgnore
+    @ManyToMany(mappedBy = "categories")
     private Set<Product> products = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
 
     // Getters and Setters
     public int getId() {
@@ -44,6 +49,14 @@ public class Category {
 
     public void setProducts(Set<Product> products) {
         this.products = products;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User user) {
+        this.createdBy = user;
     }
 
     // toString

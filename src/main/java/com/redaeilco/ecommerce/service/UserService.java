@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+// import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.redaeilco.ecommerce.model.User;
 import com.redaeilco.ecommerce.repository.UserRepository;
@@ -30,31 +31,31 @@ public class UserService {
 
     private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(5);
 
-    public Map<String, Object> registerUser(User user, String role) {
+    public Map<String, Object> registerUser(User user) {
         // Check if the username already exists
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            return null;
+            throw new IllegalArgumentException("Username already exists");
         }
 
-        // Encrypt the password and set the role
+        // Encrypt the password
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setRole(role);
+
+        // Set the role
+        if (user.getRole() == null) {
+            user.setRole("user");
+        }
 
         // Save the user to the database
-        userRepository.save(user);
+        User userSaved = userRepository.save(user);
 
         // Generate a JWT token for the user
-        String token = jwtService.generateToken(user.getUsername(), role, user.getId());
+        String token = jwtService.generateToken(userSaved.getUsername(), userSaved.getRole(), userSaved.getId());
 
         // Return the username and token
         return new HashMap<>() {{
-            put("username", user.getUsername());
+            put("username", userSaved.getUsername());
             put("token", token);
         }};
-    }
-
-    public Map<String, Object> registerUser(User user) {
-        return registerUser(user, "user");
     }
     
     public Map<String, Object> loginUser(User user) {
@@ -66,12 +67,14 @@ public class UserService {
             return null;
         }
 
+        User fullUser = userRepository.findByUsername(user.getUsername()).get();
+
         // Generate a JWT token for the user
-        String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getId());
+        String token = jwtService.generateToken(fullUser.getUsername(), fullUser.getRole(), fullUser.getId());
 
         // Return the username and token
         return new HashMap<>() {{
-            put("username", user.getUsername());
+            put("username", fullUser.getUsername());
             put("token", token);
         }};
     }
