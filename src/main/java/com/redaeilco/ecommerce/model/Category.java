@@ -4,14 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
-import javax.validation.constraints.*;
-
-import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Validated
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

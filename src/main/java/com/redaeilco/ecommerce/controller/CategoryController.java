@@ -2,13 +2,14 @@ package com.redaeilco.ecommerce.controller;
 
 import com.redaeilco.ecommerce.model.Category;
 import com.redaeilco.ecommerce.service.CategoryService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/categories")

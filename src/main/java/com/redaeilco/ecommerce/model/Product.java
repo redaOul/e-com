@@ -5,12 +5,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
-import javax.validation.constraints.*;
-
-import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.*;
 
 @Entity
-@Validated
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +21,11 @@ public class Product {
 
     @NotNull(message = "Price of the product is required")
     @Min(value = 0, message = "Price must be greater than or equal to 0")
-    private double price;
+    private Double price;
 
     @NotNull(message = "Stock quantity of the product is required")
     @Min(value = 0, message = "Stock quantity must be greater than or equal to 0")
-    private int stockQuantity;
+    private Integer stockQuantity;
 
     private String imageUrl;
 
@@ -69,7 +66,7 @@ public class Product {
         this.description = description;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
@@ -77,7 +74,7 @@ public class Product {
         this.price = price;
     }
     
-    public int getStockQuantity() {
+    public Integer getStockQuantity() {
         return stockQuantity;
     }
 
