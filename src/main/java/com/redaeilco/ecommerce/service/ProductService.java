@@ -21,9 +21,6 @@ public class ProductService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private JWTService jwtService;
-
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
@@ -34,16 +31,14 @@ public class ProductService {
             .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + id));
     }
 
-    public Product createProduct(Product product, String token) {
-        int userId = jwtService.extractUserId(token);
+    public Product createProduct(Product product, int userId) {
         User user = userRepository.findById(userId).get();
         product.setCreatedBy(user);
         return productRepository.save(product);
     }
 
-    public Product updateProduct(int id, Product productDetails, String token) {
+    public Product updateProduct(int id, Product productDetails, int userId) {
         Product product = getProductById(id);
-        int userId = jwtService.extractUserId(token);
         User user = userRepository.findById(userId).get();
         if (user != product.getCreatedBy()) {
             throw new RuntimeException("You can only update your own products.");
@@ -61,9 +56,8 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public void deleteProduct(int id, String token) {
+    public void deleteProduct(int id, int userId) {
         Product product = getProductById(id);
-        int userId = jwtService.extractUserId(token);
         User user = userRepository.findById(userId).get();
         if (user != product.getCreatedBy()) {
             throw new RuntimeException("You can only delete your own products.");

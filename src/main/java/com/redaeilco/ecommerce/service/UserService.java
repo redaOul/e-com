@@ -8,10 +8,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-// import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import com.redaeilco.ecommerce.model.User;
 import com.redaeilco.ecommerce.repository.UserRepository;
@@ -71,8 +69,7 @@ public class UserService {
     public Map<String, Object> loginUser(User user) {
         try {
             // Authenticate the user
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())); 
-            
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())); 
 
             User fullUser = userRepository.findByUsername(user.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -90,16 +87,5 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("Login failed: " + e.getMessage());
         }
-
-        // If the user is not authenticated, return null
-        // if (!authentication.isAuthenticated()) {
-        //     return null;
-        // }
-
-        // User fullUser = userRepository.findByUsername(user.getUsername()).get();
-
-
-
-
     }
 }

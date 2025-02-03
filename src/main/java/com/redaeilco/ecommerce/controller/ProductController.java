@@ -1,6 +1,7 @@
 package com.redaeilco.ecommerce.controller;
 
 import com.redaeilco.ecommerce.model.Product;
+import com.redaeilco.ecommerce.service.JWTService;
 import com.redaeilco.ecommerce.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -19,6 +20,9 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private JWTService jwtService;
+
     @GetMapping
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
@@ -34,7 +38,8 @@ public class ProductController {
     @PreAuthorize("hasRole('admin')")  // Only Admin can create a product
     public ResponseEntity<?> createProduct(@Valid @RequestBody Product product, @RequestHeader("Authorization") String token) {
         // ToDo: Handle a reel image upload
-        Product createdProduct = productService.createProduct(product, token);
+        int userId = jwtService.extractUserId(token);
+        Product createdProduct = productService.createProduct(product, userId);
         return ResponseEntity.ok(createdProduct);
     }
 
@@ -42,14 +47,16 @@ public class ProductController {
     @PreAuthorize("hasRole('admin')")  // Only Admin can create a product
     public ResponseEntity<?> updateProduct(@PathVariable int id, @Valid @RequestBody Product productDetails, @RequestHeader("Authorization") String token) {
         // ToDo: Handle a reel image upload
-        Product updatedProduct = productService.updateProduct(id, productDetails, token);
+        int userId = jwtService.extractUserId(token);
+        Product updatedProduct = productService.updateProduct(id, productDetails, userId);
         return ResponseEntity.ok(updatedProduct);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('admin')")  // Only Admin can create a product
     public ResponseEntity<?> deleteProduct(@PathVariable int id, @RequestHeader("Authorization") String token) {
-        productService.deleteProduct(id, token);
+        int userId = jwtService.extractUserId(token);
+        productService.deleteProduct(id, userId);
         return ResponseEntity.ok("Product with id " + id + " deleted successfully");
     }
 }

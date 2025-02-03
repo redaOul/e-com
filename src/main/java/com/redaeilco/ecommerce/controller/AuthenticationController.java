@@ -22,7 +22,6 @@ public class AuthenticationController {
     private UserService userService;
     
     @PostMapping("/register")
-    // use general exception handler
     public ResponseEntity<?> register(@RequestBody User requestUser) {
         Map<String, Object> respond = userService.registerUser(requestUser);
         return ResponseEntity.ok(respond);

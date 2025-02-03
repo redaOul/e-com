@@ -2,6 +2,7 @@ package com.redaeilco.ecommerce.controller;
 
 import com.redaeilco.ecommerce.model.Category;
 import com.redaeilco.ecommerce.service.CategoryService;
+import com.redaeilco.ecommerce.service.JWTService;
 
 import jakarta.validation.Valid;
 
@@ -18,6 +19,9 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+    
+    @Autowired
+    private JWTService jwtService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('admin')") 
@@ -34,21 +38,24 @@ public class CategoryController {
     @PostMapping
     @PreAuthorize("hasAuthority('admin')")  // Only Admin can create a product
     public ResponseEntity<?> createCategory(@Valid @RequestBody Category category, @RequestHeader("Authorization") String token) {
-        Category createdCategory = categoryService.createCategory(category, token);
+        int userId = jwtService.extractUserId(token);
+        Category createdCategory = categoryService.createCategory(category, userId);
         return ResponseEntity.ok(createdCategory);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('admin')")   // Only Admin can create a product
     public ResponseEntity<?> updateCategory(@PathVariable int id, @Valid @RequestBody Category categoryDetails, @RequestHeader("Authorization") String token) {
-        Category updatededCategory =  categoryService.updateCategory(id, categoryDetails, token);
+        int userId = jwtService.extractUserId(token);
+        Category updatededCategory =  categoryService.updateCategory(id, categoryDetails, userId);
         return ResponseEntity.ok(updatededCategory);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('admin')")  // Only Admin can create a product
     public ResponseEntity<?> deleteCategory(@PathVariable int id, @RequestHeader("Authorization") String token) {
-        categoryService.deleteCategory(id, token);
+        int userId = jwtService.extractUserId(token);
+        categoryService.deleteCategory(id, userId);
         return ResponseEntity.ok("Category with id " + id + " deleted successfully");
     }
 }

@@ -26,7 +26,6 @@ public class MyUserDetailsService implements UserDetailsService {
         Optional<User> user = userRepository.findByUsername(username);
 
         if (!user.isPresent()) {
-            System.out.println("SOT > User not found with username: " + username);
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
 

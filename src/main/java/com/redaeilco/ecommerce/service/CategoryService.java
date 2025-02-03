@@ -21,11 +21,7 @@ public class CategoryService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private JWTService jwtService;
-
     public List<Category> getAllCategories() {
-        System.out.println("Fetching all categories");
         return categoryRepository.findAll();
     }
 
@@ -35,16 +31,14 @@ public class CategoryService {
             .orElseThrow(() -> new EntityNotFoundException("Category not found with ID: " + id));
     }
 
-    public Category createCategory(Category category, String token) {
-        int userId = jwtService.extractUserId(token);
+    public Category createCategory(Category category, int userId) {
         User user = userRepository.findById(userId).get();
         category.setCreatedBy(user);
         return categoryRepository.save(category);
     }
 
-    public Category updateCategory(int id, Category categoryDetails, String token) {
+    public Category updateCategory(int id, Category categoryDetails, int userId) {
         Category category = getCategoryById(id);
-        int userId = jwtService.extractUserId(token);
         User user = userRepository.findById(userId).get();
         if (user != category.getCreatedBy()) {
             throw new RuntimeException("You can only update your own categories.");
@@ -53,9 +47,8 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    public void deleteCategory(int id, String token) {
+    public void deleteCategory(int id, int userId) {
         Category category = getCategoryById(id);
-        int userId = jwtService.extractUserId(token);
         User user = userRepository.findById(userId).get();
         if (user != category.getCreatedBy()) {
             throw new RuntimeException("You can only delete your own categories.");
