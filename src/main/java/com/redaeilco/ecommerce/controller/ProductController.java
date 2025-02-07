@@ -34,6 +34,24 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    @GetMapping("/category")
+    public ResponseEntity<List<Product>> getProductsByCategoryIds(@RequestParam List<Integer> categoryIds) {
+        List<Product> products = productService.getProductsByCategoryIds(categoryIds);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/price")
+    public ResponseEntity<List<Product>> getProductsByPrice(@RequestParam double maxPrice) {
+        List<Product> products = productService.getProductsByPriceRange(maxPrice);
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> getProductsByName(@RequestParam String name) {
+        List<Product> products = productService.getProductsByName(name);
+        return ResponseEntity.ok(products);
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('admin')")  // Only Admin can create a product
     public ResponseEntity<?> createProduct(@Valid @RequestBody Product product, @RequestHeader("Authorization") String token) {

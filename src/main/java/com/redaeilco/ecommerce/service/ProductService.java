@@ -31,6 +31,21 @@ public class ProductService {
             .orElseThrow(() -> new EntityNotFoundException("Product not found with ID: " + id));
     }
 
+    public List<Product> getProductsByCategoryIds(List<Integer> categoryIds) {
+        return productRepository.findByCategories_IdIn(categoryIds)
+            .orElseThrow(() -> new EntityNotFoundException("No products found for category with IDs: " + categoryIds));
+    }
+
+    public List<Product> getProductsByPriceRange(double maxPrice) {
+        return productRepository.findByPriceLessThanEqual(maxPrice)
+            .orElseThrow(() -> new EntityNotFoundException("No products found"));
+    }
+
+    public List<Product> getProductsByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name)
+            .orElseThrow(() -> new EntityNotFoundException("No products found"));
+    }
+
     public Product createProduct(Product product, int userId) {
         User user = userRepository.findById(userId).get();
         product.setCreatedBy(user);
