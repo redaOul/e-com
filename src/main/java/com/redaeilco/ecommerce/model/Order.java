@@ -11,6 +11,7 @@ import com.redaeilco.ecommerce.enums.OrderStatus;
 
 import jakarta.persistence.*;
 
+@Table(name = "_order")
 @Entity
 @Getter
 @Setter
@@ -33,7 +34,6 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    // orders may be linnked to a discount
     @ManyToOne
     @JoinColumn(name = "discount_id")
     private Discount discount;

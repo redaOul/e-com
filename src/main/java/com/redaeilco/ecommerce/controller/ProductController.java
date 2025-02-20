@@ -12,6 +12,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RestController
 @RequestMapping("/products")
@@ -36,8 +42,12 @@ public class ProductController {
 
     @GetMapping("/category")
     public ResponseEntity<List<Product>> getProductsByCategoryIds(@RequestParam List<Integer> categoryIds) {
-        List<Product> products = productService.getProductsByCategoryIds(categoryIds);
-        return ResponseEntity.ok(products);
+        if (categoryIds.isEmpty()) {
+            return ResponseEntity.ok(productService.getAllProducts());
+        } else {
+            List<Product> products = productService.getProductsByCategoryIds(categoryIds);
+            return ResponseEntity.ok(products);
+        }
     }
 
     @GetMapping("/price")
@@ -47,8 +57,8 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Product>> getProductsByName(@RequestParam String name) {
-        List<Product> products = productService.getProductsByName(name);
+    public ResponseEntity<List<Product>> getProductsByName(@RequestParam String input) {
+        List<Product> products = productService.getProductsByName(input);
         return ResponseEntity.ok(products);
     }
 

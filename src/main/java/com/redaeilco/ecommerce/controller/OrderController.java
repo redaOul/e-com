@@ -1,11 +1,8 @@
 package com.redaeilco.ecommerce.controller;
 
-import com.redaeilco.ecommerce.dto.PlaceOrderRequest;
-import com.redaeilco.ecommerce.enums.PaymentMethod;
 import com.redaeilco.ecommerce.dto.OrderResponse;
 import com.redaeilco.ecommerce.service.JWTService;
 import com.redaeilco.ecommerce.service.OrderService;
-import com.redaeilco.ecommerce.service.PaymentService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/orders")
@@ -22,15 +20,14 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    private PaymentService paymentService;
-
     @Autowired
     private JWTService jwtService;
 
-    @PostMapping("/place")
-    public ResponseEntity<OrderResponse> placeOrder(@RequestHeader("Authorization") String token, @RequestBody PlaceOrderRequest request) {
+    @PostMapping("/place/{cartId}")
+    public ResponseEntity<OrderResponse> placeOrder(@RequestHeader("Authorization") String token, @PathVariable int cartId) {
         int userId = extractUserIdFromToken(token);
-        return ResponseEntity.ok(orderService.placeOrder(userId/*, request */));
+        System.out.println(cartId);
+        return ResponseEntity.ok(orderService.placeOrder(userId, cartId));
     }
 
     @GetMapping("/history")
@@ -47,14 +44,11 @@ public class OrderController {
 
     // check typed discount
     @PostMapping("/{orderId}/apply-discount")
-    public ResponseEntity<OrderResponse> applyDiscount(@RequestHeader("Authorization") String token, @PathVariable int orderId, @RequestBody String request) {
-        return ResponseEntity.ok(orderService.applyDiscount(orderId, request));
-    }
-
-    @PostMapping("/pay")
-    public ResponseEntity<String> payOrder(@RequestParam int orderId, @RequestParam PaymentMethod paymentMethod) {
-        paymentService.processPayment(orderId, paymentMethod);
-        return ResponseEntity.ok("Payment successful, order completed");
+    public ResponseEntity<OrderResponse> applyDiscount(@RequestHeader("Authorization") String token, @PathVariable int orderId, @RequestBody Map<String, String> request) {
+        String voucherCode = request.get("voucherCode");
+        System.out.println(voucherCode);
+        System.out.println(orderId);
+        return ResponseEntity.ok(orderService.applyDiscount(orderId, voucherCode));
     }
 
     private int extractUserIdFromToken(String token) {

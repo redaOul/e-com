@@ -10,6 +10,7 @@ import com.redaeilco.ecommerce.model.OrderItem;
 import com.redaeilco.ecommerce.repository.CartRepository;
 import com.redaeilco.ecommerce.repository.DiscountRepository;
 import com.redaeilco.ecommerce.repository.OrderRepository;
+
 import com.redaeilco.ecommerce.dto.OrderResponse;
 import com.redaeilco.ecommerce.dto.OrderItemResponse;
 
@@ -33,8 +34,8 @@ public class OrderService {
     @Autowired
     private DiscountRepository discountRepository;
 
-    public OrderResponse placeOrder(int userId/*, PlaceOrderRequest request*/) {
-        Cart cart = cartRepository.findByUserId(userId)
+    public OrderResponse placeOrder(int userId, int cartId) {
+        Cart cart = cartRepository.findById(cartId)
             .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         if (cart.getItems().isEmpty()) {
@@ -55,12 +56,14 @@ public class OrderService {
         orderRepository.save(order);
         cartRepository.delete(cart);
 
-        // // Process payment
-        // paymentService.processPayment(order, request.getMethod());
-
         return new OrderResponse(order.getId(), order.getStatus(), order.getTotalPrice(), 0,
             orderItems.stream()
-                .map(item -> new OrderItemResponse(item.getProduct().getId(), item.getProduct().getName(), item.getQuantity(), item.getPrice()))
+                .map(item -> new OrderItemResponse(
+                    item.getProduct().getId(),
+                    item.getProduct().getName(),
+                    item.getProduct().getImageUrl(),
+                    item.getQuantity(),
+                    item.getPrice()))
                 .collect(Collectors.toList()));
     }
 
@@ -70,7 +73,12 @@ public class OrderService {
             .map(order -> new OrderResponse(order.getId(), order.getStatus(), order.getTotalPrice(), 
                 order.getDiscount() != null ? order.getDiscount().getPercentage() : 0,
                 order.getItems().stream()
-                    .map(item -> new OrderItemResponse(item.getProduct().getId(), item.getProduct().getName(), item.getQuantity(), item.getPrice()))
+                    .map(item -> new OrderItemResponse(
+                        item.getProduct().getId(), 
+                        item.getProduct().getName(), 
+                        item.getProduct().getImageUrl(),
+                        item.getQuantity(), 
+                        item.getPrice()))
                     .collect(Collectors.toList())))
             .collect(Collectors.toList());
     }
@@ -81,7 +89,12 @@ public class OrderService {
         return new OrderResponse(order.getId(), order.getStatus(), order.getTotalPrice(),
             order.getDiscount() != null ? order.getDiscount().getPercentage() : 0,
             order.getItems().stream()
-                .map(item -> new OrderItemResponse(item.getProduct().getId(), item.getProduct().getName(), item.getQuantity(), item.getPrice()))
+                .map(item -> new OrderItemResponse(
+                    item.getProduct().getId(),
+                    item.getProduct().getName(),
+                    item.getProduct().getImageUrl(),
+                    item.getQuantity(),
+                    item.getPrice()))
                 .collect(Collectors.toList()));
     }
 
@@ -96,13 +109,25 @@ public class OrderService {
             throw new RuntimeException("Invalid Discount Code");
         }
 
-        double discountAmount = discount.calculateDiscount(order.getTotalPrice());
-        order.setTotalPrice(order.getTotalPrice() - discountAmount);
+        order.setDiscount(discount);
+        orderRepository.save(order);
 
         return new OrderResponse(order.getId(), order.getStatus(), order.getTotalPrice(),
             discount.getPercentage(),
             order.getItems().stream()
-                .map(item -> new OrderItemResponse(item.getProduct().getId(), item.getProduct().getName(), item.getQuantity(), item.getPrice()))
+                .map(item -> new OrderItemResponse(
+                    item.getProduct().getId(),
+                    item.getProduct().getName(),
+                    item.getProduct().getImageUrl(),
+                    item.getQuantity(),
+                    item.getPrice()))
                 .collect(Collectors.toList()));
     }
+
+    // public void updateOrderStatus(int orderId, OrderStatus status) {
+    //     Order order = orderRepository.findById(orderId)
+    //             .orElseThrow(() -> new RuntimeException("Order not found"));
+    //     order.setStatus(status);
+    //     orderRepository.save(order);
+    // }
 }

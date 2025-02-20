@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.redaeilco.ecommerce.dto.AddToCartRequest;
+import com.redaeilco.ecommerce.dto.UpdateCartItemRequest;
 import com.redaeilco.ecommerce.dto.CartItemResponse;
 import com.redaeilco.ecommerce.dto.CartResponse;
 import com.redaeilco.ecommerce.model.Cart;
@@ -39,16 +39,17 @@ public class CartService {
                 .map(item -> new CartItemResponse(
                         item.getProduct().getId(),
                         item.getProduct().getName(),
+                        item.getProduct().getImageUrl(),
                         item.getQuantity(),
                         item.getQuantity() * item.getProduct().getPrice()))
                 .collect(Collectors.toList());
 
         double totalPrice = items.stream().mapToDouble(CartItemResponse::getPrice).sum();
 
-        return new CartResponse(items, totalPrice);
+        return new CartResponse(cart.getId(), items, totalPrice);
     }
 
-    public CartResponse addToCart(int userId, AddToCartRequest request) {
+    public CartResponse addToCart(int userId, UpdateCartItemRequest request) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseGet(() -> createCartForUser(userId));
 
@@ -70,20 +71,20 @@ public class CartService {
         return getCart(userId);
     }
 
-    public CartResponse removeFromCart(int userId, int productId, int quantity) {
+    public CartResponse removeFromCart(int userId, UpdateCartItemRequest request) {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
         Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getProduct().getId() == productId)
+                .filter(item -> item.getProduct().getId() == request.getProductId())
                 .findFirst();
 
         if (existingItem.isPresent()) {
             CartItem item = existingItem.get();
-            if (quantity == -1 || item.getQuantity() <= quantity) {
+            if (request.getQuantity() == -1 || item.getQuantity() <= request.getQuantity()) {
                 cart.getItems().remove(item);
             } else {
-                item.setQuantity(item.getQuantity() - quantity);
+                item.setQuantity(item.getQuantity() - request.getQuantity());
             }
         } else {
             throw new RuntimeException("Product not found in cart");
@@ -94,7 +95,8 @@ public class CartService {
     }
 
     public CartResponse removeFromCart(int userId, int productId) {
-        return removeFromCart(userId, productId, -1);
+        UpdateCartItemRequest request = new UpdateCartItemRequest(productId, -1);
+        return removeFromCart(userId, request);
     }
 
     private Cart createCartForUser(int userId) {

@@ -1,6 +1,6 @@
 package com.redaeilco.ecommerce.controller;
 
-import com.redaeilco.ecommerce.dto.AddToCartRequest;
+import com.redaeilco.ecommerce.dto.UpdateCartItemRequest;
 import com.redaeilco.ecommerce.dto.CartResponse;
 import com.redaeilco.ecommerce.service.CartService;
 import com.redaeilco.ecommerce.service.JWTService;
@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @RequestMapping("/cart")
@@ -28,15 +30,15 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<CartResponse> addToCart(@RequestHeader("Authorization") String token, @RequestBody AddToCartRequest request) {
+    public ResponseEntity<CartResponse> addToCart(@RequestHeader("Authorization") String token, @RequestBody UpdateCartItemRequest request) {
         int userId = extractUserIdFromToken(token);
         return ResponseEntity.ok(cartService.addToCart(userId, request));
     }
 
-    @DeleteMapping("/remove/{productId}/{quantity}")
-    public ResponseEntity<CartResponse> removeFromCart(@RequestHeader("Authorization") String token, @PathVariable int productId, @PathVariable int quantity) {
+    @PostMapping("/remove")
+    public ResponseEntity<CartResponse> removeFromCart(@RequestHeader("Authorization") String token, @RequestBody UpdateCartItemRequest request) {
         int userId = extractUserIdFromToken(token);
-        return ResponseEntity.ok(cartService.removeFromCart(userId, productId, quantity));
+        return ResponseEntity.ok(cartService.removeFromCart(userId, request));
     }
 
     @DeleteMapping("/remove/{productId}")
@@ -48,6 +50,4 @@ public class CartController {
     private int extractUserIdFromToken(String token) {
         return jwtService.extractUserId(token);
     }
-
-    
 }

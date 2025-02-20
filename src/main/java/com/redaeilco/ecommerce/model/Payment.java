@@ -18,7 +18,13 @@ import jakarta.persistence.*;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
+
+    private String stripePaymentId;
+
+    private double amount;
+
+    private String cardOwner;
 
     @OneToOne
     @JoinColumn(name = "order_id", nullable = false)
