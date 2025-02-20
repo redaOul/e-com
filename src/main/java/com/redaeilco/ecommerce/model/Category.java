@@ -26,6 +26,11 @@ public class Category {
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
+    public Category(String name, User user) {
+        this.name = name;
+        this.createdBy = user;
+    }
+
     // Getters and Setters
     public int getId() {
         return id;

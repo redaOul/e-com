@@ -21,6 +21,11 @@ public class User {
     @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
     private Set<Category> categories = new HashSet<>();
 
+    public User(String username, String role){
+        this.username = username;
+        this.role = role;
+    }
+
     public int getId() {
         return id;
     }

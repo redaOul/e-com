@@ -50,6 +50,15 @@ public class Product {
     @JsonIgnore
     private LocalDateTime updatedAt;
 
+    public Product(String name, String description, double price, int quantity, String imageUrl, User user) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stockQuantity = quantity;
+        this.imageUrl = imageUrl;
+        this.createdBy = user;
+    }
+
     // Getters and Setters
     public int getId() {
         return id;
