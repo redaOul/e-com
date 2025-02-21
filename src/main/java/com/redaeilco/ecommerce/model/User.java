@@ -3,9 +3,13 @@ package com.redaeilco.ecommerce.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
 public class User {
     @Id

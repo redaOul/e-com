@@ -6,7 +6,6 @@ import com.redaeilco.ecommerce.model.User;
 import com.redaeilco.ecommerce.repository.CategoryRepository;
 import com.redaeilco.ecommerce.repository.ProductRepository;
 import com.redaeilco.ecommerce.repository.UserRepository;
-import com.stripe.model.tax.Registration.CountryOptions.Us;
 
 import jakarta.transaction.Transactional;
 

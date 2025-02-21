@@ -103,7 +103,11 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
     
         Discount discount = discountRepository.findByCode(discountCode)
-                .orElseThrow(() -> new RuntimeException("Invalid Discount Code"));
+                .orElseThrow(() -> {
+                    order.setDiscount(null);
+                    orderRepository.save(order);
+                    throw new RuntimeException("Invalid Discount Code");
+                });
     
         if (!discount.isValid()) {
             throw new RuntimeException("Invalid Discount Code");
@@ -123,11 +127,4 @@ public class OrderService {
                     item.getPrice()))
                 .collect(Collectors.toList()));
     }
-
-    // public void updateOrderStatus(int orderId, OrderStatus status) {
-    //     Order order = orderRepository.findById(orderId)
-    //             .orElseThrow(() -> new RuntimeException("Order not found"));
-    //     order.setStatus(status);
-    //     orderRepository.save(order);
-    // }
 }
